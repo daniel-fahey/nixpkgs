@@ -224,6 +224,19 @@ in {
     filesToInstall = ["u-boot.bin"];
   };
 
+  ubootHelios64 = buildUBoot {
+    extraPatches = [
+      (fetchpatch {
+        url = "https://raw.githubusercontent.com/daniel-fahey/armbian/u-boot-helios64-v2024.07/patch/u-boot/u-boot-rockchip64/add-board-helios64.patch";
+        hash = "sha256-+urOHbjZoH/Vk15feqk2BF9xwSmfsXbXMM7HACzA/tg=";
+      })
+    ];
+    defconfig = "helios64-rk3399_defconfig";
+    extraMeta.platforms = ["aarch64-linux"];
+    BL31 = "${armTrustedFirmwareRK3399}/bl31.elf";
+    filesToInstall = [ "u-boot.itb" "idbloader.img"];
+  };
+
   ubootJetsonTK1 = buildUBoot {
     defconfig = "jetson-tk1_defconfig";
     extraMeta.platforms = ["armv7l-linux"];

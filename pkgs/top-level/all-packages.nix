@@ -27157,6 +27157,7 @@ with pkgs;
     ubootClearfog
     ubootCubieboard2
     ubootGuruplug
+    ubootHelios64
     ubootJetsonTK1
     ubootLibreTechCC
     ubootNanoPCT4
