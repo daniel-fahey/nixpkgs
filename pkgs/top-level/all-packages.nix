@@ -13311,6 +13311,7 @@ with pkgs;
     ubootCubieboard2
     ubootGuruplug
     ubootJetsonTK1
+    ubootKhadasEdge2
     ubootLibreTechCC
     ubootNanoPCT4
     ubootNanoPCT6
