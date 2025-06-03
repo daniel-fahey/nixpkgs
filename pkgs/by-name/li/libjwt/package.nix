@@ -2,29 +2,34 @@
   stdenv,
   lib,
   fetchFromGitHub,
-  autoreconfHook,
+  cmake,
   pkg-config,
   jansson,
   openssl,
+  gnutls,
+  mbedtls,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libjwt";
-  version = "1.18.1";
+  version = "3.2.1";
 
   src = fetchFromGitHub {
     owner = "benmcollins";
     repo = "libjwt";
-    rev = "v${version}";
-    sha256 = "sha256-0gFMeSW4gfbI6MUctcN8UuKhMDswaT8BzHTV2VuwZzc=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-/Fm7pIlcjsAWaPUoRMOoYgUpEA+AwWzOuGgxVjiHjNc=";
   };
 
   buildInputs = [
     jansson
     openssl
+    gnutls
+    mbedtls
   ];
+
   nativeBuildInputs = [
-    autoreconfHook
+    cmake
     pkg-config
   ];
 
@@ -35,4 +40,4 @@ stdenv.mkDerivation rec {
     maintainers = with maintainers; [ pnotequalnp ];
     platforms = platforms.all;
   };
-}
+})
