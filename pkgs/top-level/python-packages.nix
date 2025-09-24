@@ -75,6 +75,8 @@ self: super: with self; {
 
   adax-local = callPackage ../development/python-modules/adax-local { };
 
+  adapters = callPackage ../development/python-modules/adapters { };
+
   adb-enhanced = callPackage ../development/python-modules/adb-enhanced { };
 
   adb-homeassistant = callPackage ../development/python-modules/adb-homeassistant { };
@@ -19647,6 +19649,8 @@ self: super: with self; {
   wtforms-bootstrap5 = callPackage ../development/python-modules/wtforms-bootstrap5 { };
 
   wtforms-sqlalchemy = callPackage ../development/python-modules/wtforms-sqlalchemy { };
+
+  wtpsplit = callPackage ../development/python-modules/wtpsplit { };
 
   wunsen = callPackage ../development/python-modules/wunsen { };
 
