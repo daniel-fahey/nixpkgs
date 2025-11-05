@@ -4,7 +4,7 @@
   callPackage,
   vscode-generic,
   fetchurl,
-  appimageTools,
+  dpkg,
   undmg,
   commandLineArgs ? "",
   useVSCodeRipgrep ? stdenv.hostPlatform.isDarwin,
@@ -16,12 +16,12 @@ let
 
   sources = {
     x86_64-linux = fetchurl {
-      url = "https://downloads.cursor.com/production/25412918da7e74b2686b25d62da1f01cfcd27683/linux/x64/Cursor-2.0.64-x86_64.AppImage";
-      hash = "sha256-zT9GhdwGDWZJQl+WpV2txbmp3/tJRtL6ds1UZQoKNzA=";
+      url = "https://downloads.cursor.com/production/25412918da7e74b2686b25d62da1f01cfcd27683/linux/x64/deb/amd64/deb/cursor_2.0.64_amd64.deb";
+      hash = "sha256-TEVIxHLQR5sLicVyJAW76JXu4Qtq++xVC90OVTJ0fY0=";
     };
     aarch64-linux = fetchurl {
-      url = "https://downloads.cursor.com/production/25412918da7e74b2686b25d62da1f01cfcd27683/linux/arm64/Cursor-2.0.64-aarch64.AppImage";
-      hash = "sha256-1pN9LfnplKyVUxlICQ2KsxcAn++dZY9hGR4XubHxLUY=";
+      url = "https://downloads.cursor.com/production/25412918da7e74b2686b25d62da1f01cfcd27683/linux/arm64/deb/arm64/deb/cursor_2.0.64_arm64.deb";
+      hash = "sha256-eJ5PLs5DO+l+B5EW4/ZbjubX4SgZb+aJ1+Ie7R3ZEe0=";
     };
     x86_64-darwin = fetchurl {
       url = "https://downloads.cursor.com/production/25412918da7e74b2686b25d62da1f01cfcd27683/darwin/x64/Cursor-darwin-x64.dmg";
@@ -35,7 +35,7 @@ let
 
   source = sources.${hostPlatform.system};
 in
-(callPackage vscode-generic rec {
+(callPackage vscode-generic {
   inherit useVSCodeRipgrep;
   commandLineArgs = finalCommandLineArgs;
 
@@ -52,17 +52,9 @@ in
   libraryName = "cursor";
   iconName = "cursor";
 
-  src =
-    if hostPlatform.isLinux then
-      appimageTools.extract {
-        inherit pname version;
-        src = source;
-      }
-    else
-      source;
+  src = source;
 
-  sourceRoot =
-    if hostPlatform.isLinux then "${pname}-${version}-extracted/usr/share/cursor" else "Cursor.app";
+  sourceRoot = if hostPlatform.isLinux then "usr/share/cursor" else "Cursor.app";
 
   tests = { };
 
@@ -84,6 +76,7 @@ in
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with lib.maintainers; [
       aspauldingcode
+      daniel-fahey
       prince213
     ];
     platforms = [
@@ -96,7 +89,19 @@ in
 }).overrideAttrs
   (oldAttrs: {
     nativeBuildInputs =
-      (oldAttrs.nativeBuildInputs or [ ]) ++ lib.optionals hostPlatform.isDarwin [ undmg ];
+      (oldAttrs.nativeBuildInputs or [ ])
+      ++ lib.optionals hostPlatform.isLinux [ dpkg ]
+      ++ lib.optionals hostPlatform.isDarwin [ undmg ];
+
+    unpackPhase =
+      if hostPlatform.isLinux then
+        ''
+          runHook preUnpack
+          dpkg --fsys-tarfile $src | tar --extract
+          runHook postUnpack
+        ''
+      else
+        oldAttrs.unpackPhase or null;
 
     passthru = (oldAttrs.passthru or { }) // {
       inherit sources;
