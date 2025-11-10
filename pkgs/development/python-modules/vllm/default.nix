@@ -34,7 +34,7 @@
   uvicorn,
   pydantic,
   aioprometheus,
-  pynvml,
+  nvidia-ml-py,
   openai,
   pyzmq,
   tiktoken,
@@ -300,6 +300,10 @@ buildPythonPackage rec {
     ./0002-setup.py-nix-support-respect-cmakeFlags.patch
     ./0003-propagate-pythonpath.patch
     ./0005-drop-intel-reqs.patch
+    (fetchpatch {
+      url = "https://github.com/daniel-fahey/vllm/commit/5cfd60530f57e461c4a1adc7d7d8e961b2ce1e4b.patch?full_index=1";
+      hash = "sha256-nRMH3l8AwM6dIxwy5TIvrNPdmSPaXkZJ6Plm/pnaLXw=";
+    })
     # TODO: Remove the below patches when included in vLLM release
     (fetchpatch {
       url = "https://github.com/vllm-project/vllm/commit/9705fba7b727a3b9c275b012258608531e2223d1.patch";
@@ -442,7 +446,7 @@ buildPythonPackage rec {
   ]
   ++ lib.optionals cudaSupport [
     cupy
-    pynvml
+    nvidia-ml-py
     flashinfer
   ];
 
