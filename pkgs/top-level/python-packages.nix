@@ -21122,6 +21122,8 @@ self: super: with self; {
 
   yubico-client = callPackage ../development/python-modules/yubico-client { };
 
+  zai-sdk = callPackage ../development/python-modules/zai-sdk { };
+
   z3-solver = (toPythonModule (pkgs.z3.override { python3Packages = self; })).python;
 
   z3c-checkversions = callPackage ../development/python-modules/z3c-checkversions { };
