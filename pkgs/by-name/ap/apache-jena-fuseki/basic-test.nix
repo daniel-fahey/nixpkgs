@@ -13,8 +13,9 @@ runCommand "fuseki-test-${apache-jena-fuseki.name}"
   ''
     export FUSEKI_BASE="$PWD/fuseki-base"
     mkdir -p "$FUSEKI_BASE/db"
-    FUSEKI_ARGS="--update --loc=$FUSEKI_BASE/db /dataset" fuseki start
-    fuseki status
+    fuseki --update --loc=$FUSEKI_BASE/db /dataset &
+    FUSEKI_PID=$!
+    trap 'kill "$FUSEKI_PID"' EXIT
     for i in $(seq 120); do
         if  curl http://127.0.0.1:3030/dataset/data; then
             break;
