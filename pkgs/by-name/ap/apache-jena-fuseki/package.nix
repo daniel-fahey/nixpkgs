@@ -34,9 +34,23 @@ stdenv.mkDerivation (finalAttrs: {
       wrapProgram "$i" \
         --prefix "PATH" : "$out/bin:${jre}/bin:${coreutils}/bin:${which}/bin" \
         --set-default "FUSEKI_HOME" "$out" \
-        --run "if [ -z \"\$FUSEKI_BASE\" ]; then export FUSEKI_BASE=\"\$HOME/.local/fuseki\" ; mkdir -p \"\$HOME/.local/fuseki\" ; fi" \
+        --run "if [ -z \"\$FUSEKI_BASE\" ]; then export FUSEKI_BASE=\"\$PWD/.fuseki\" ; mkdir -p \"\$FUSEKI_BASE\" ; fi" \
         ;
     done
+  '';
+
+  # Upstream's inner fuseki-server builds its classpath from FUSEKI_BASE/extra/*.
+  # Turn the script comment's manual CP override into an env seam: FUSEKI_PLUGINS
+  # (colon-separated jar paths) appends to CP after the extra/ glob, so composed
+  # plugins arrive as data (store paths) instead of staged symlinks.
+  postFixup = ''
+    substituteInPlace "$out/fuseki-server" \
+      --replace-fail 'JVM_ARGS=''${JVM_ARGS:--Xmx4G}' 'if [ -n "''${FUSEKI_PLUGINS:-}" ]
+then
+   CP="''${CP}:''${FUSEKI_PLUGINS}"
+fi
+
+JVM_ARGS=''${JVM_ARGS:--Xmx4G}'
   '';
 
   passthru = {
